@@ -11,12 +11,13 @@ namespace WeatherChecker.Abstracts
         string MainInformation { get; }
         string Description { get; }
 
-        float FarenheitTemperature { get; }
-        float MaxFarenheitTemperature { get; }
-        float MinFarenheitTemperature { get; }
+        float KelvinTemperature { get; }
+        
+        float MaxKelvinTemperature { get; }
+        float MinKelnivTemperature { get; }
 
         int Humidity { get; }
         float WindSpeed { get; }
-        int WindDegree { get; }
+        float WindDegree { get; }
     }
 }

@@ -9,6 +9,19 @@ namespace WeatherChecker.Models
 {
     public class WeatherData : IWeatherData
     {
+        public WeatherData(string description,float farenheitTemperature,int humidity,string mainInformation,
+            float maxFarenheitTemperature, float minFarenheitTemperature, float windDegree, float windSpeed)
+        {
+            _description = description;
+            _farenheitTemperature = farenheitTemperature;
+            _humidity = humidity;
+            _mainInformation = mainInformation;
+            _maxFarenheitTemperature = maxFarenheitTemperature;
+            _minFarenheitTemperature = minFarenheitTemperature;
+            _windDegree = windDegree;
+            _windSpeed = windSpeed;
+
+        }
         private string _description;
         public string Description
         {
@@ -19,7 +32,7 @@ namespace WeatherChecker.Models
         }
 
         private float _farenheitTemperature;
-        public float FarenheitTemperature
+        public float KelvinTemperature
         {
             get
             {
@@ -46,7 +59,7 @@ namespace WeatherChecker.Models
         }
 
         private float _maxFarenheitTemperature;
-        public float MaxFarenheitTemperature
+        public float MaxKelvinTemperature
         {
             get
             {
@@ -55,7 +68,7 @@ namespace WeatherChecker.Models
         }
 
         private float _minFarenheitTemperature;
-        public float MinFarenheitTemperature
+        public float MinKelnivTemperature
         {
             get
             {
@@ -63,8 +76,8 @@ namespace WeatherChecker.Models
             }
         }
 
-        private int _windDegree;
-        public int WindDegree
+        private float _windDegree;
+        public float WindDegree
         {
             get
             {

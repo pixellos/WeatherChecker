@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WeatherChecker.Abstracts;
-
+using System.Globalization;
 
 namespace WeatherChecker.Models.Tests
 {
@@ -17,49 +17,70 @@ namespace WeatherChecker.Models.Tests
         [TestMethod()]
         public void GetWeatherDataTest()
         {
-            Assert.Fail();
+            OpenWeatherConnection weather = new OpenWeatherConnection();
+            weather.City="Krosno";
+            IWeatherData data = weather.GetWeatherData();
+            
+            Assert.IsNotNull(data.MainInformation);
+            Assert.IsNotNull(data.Description);
+            Assert.IsNotNull(data.KelvinTemperature);
+            Assert.IsNotNull(data.Humidity) ;
+            Assert.IsNotNull(data.MaxKelvinTemperature);
+            Assert.IsNotNull(data.MinKelnivTemperature);
+            Assert.IsNotNull(data.WindDegree);
+            Assert.IsNotNull(data.WindSpeed);
         }
+        [TestMethod()]
+        public void TestMultiHours()
+        {
+            OpenWeatherConnection weather = new OpenWeatherConnection() {_ByCityAdress= "data/2.5/forecast?q=", _OpenWeatherMapApiJSONSeparator="=\"" };
+            weather.City = "Krosno";
+            IWeatherData data = weather.GetWeatherData();
+
+            Assert.AreNotEqual("NaN", data.Description);
+            Assert.AreNotEqual("NaN", data.MainInformation);
+            Assert.AreNotEqual(0, data.KelvinTemperature);
+            Assert.AreNotEqual(0, data.Humidity);
+            Assert.AreNotEqual(0, data.MaxKelvinTemperature);
+            Assert.AreNotEqual(0, data.MinKelnivTemperature);
+            Assert.AreNotEqual(0, data.WindDegree);
+            Assert.AreNotEqual(0, data.WindSpeed);
+        }
+
+
+        [TestMethod()]
+        public void GetWeatherAgainTest()
+        {
+            OpenWeatherConnection weather = new OpenWeatherConnection();
+            weather.City = "Krosno";
+            IWeatherData data = weather.GetWeatherData();
+
+            Assert.AreNotEqual("NaN", data.Description);
+            Assert.AreNotEqual("NaN", data.MainInformation);
+            Assert.AreNotEqual(0,data.KelvinTemperature);
+            Assert.AreNotEqual(0,data.Humidity);
+            Assert.AreNotEqual(0,data.MaxKelvinTemperature);
+            Assert.AreNotEqual(0,data.MinKelnivTemperature);
+            Assert.AreNotEqual(0,data.WindDegree);
+            Assert.AreNotEqual(0,data.WindSpeed);
+        }
+
 
         [TestMethod()]
         public void Parsing()
         {
             OpenWeatherConnection weather = new OpenWeatherConnection();
-            var s = weather.ParseStringBeforeSemicolon("main", "temp_max", "\":", TemplateJSON);
-            Assert.AreEqual("286.48",s);
-
+            var s = TemplateJSON.ParseAPIData("main", "temp_max", "\":","0123456789.");
+            var result = Double.Parse(s, CultureInfo.InvariantCulture);
+            Assert.AreEqual(286.48,result);
         }
 
         [TestMethod()]
         public void SetNewWeatherTargetTestCityName()
         {
             IWeatherConnection weatherConnection = new OpenWeatherConnection();
-            weatherConnection.SetNewWeatherTarget("Krosno");
-
+            weatherConnection.City = "Krosno";
             Assert.AreEqual(weatherConnection.City, "Krosno");
-           
-        }
-
-        [TestMethod()]
-        public void SetNewWeatherTargetTestCityNameAndCountryCode()
-        {
-            IWeatherConnection weatherConnection = new OpenWeatherConnection();
-            weatherConnection.SetNewWeatherTarget("Krosno","616");
-
-            Assert.AreEqual(weatherConnection.City, "Krosno");
-            Assert.AreEqual(weatherConnection.CountryCode, "616");
-            
-        }
-
-        [TestMethod()]
-        public void SetNewWeatherTargetTestLatitudeLongitude()
-        {
-            IWeatherConnection weatherConnection = new OpenWeatherConnection();
-            weatherConnection.SetNewWeatherTarget(61.16, 16.61);
-
-            Assert.AreEqual(weatherConnection.City, null);
-            Assert.AreEqual(weatherConnection.CountryCode, null);
-            Assert.AreEqual(weatherConnection.Latitude, 16.61);
-            Assert.AreEqual(weatherConnection.Longitude, 61.16);
         }
     }
 }

@@ -4,119 +4,146 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WeatherChecker.Abstracts;
-using System.Net.Http;
-using System.Net.Http.Headers;
-
+using System.Net;
+using System.Globalization;
 
 namespace WeatherChecker.Models
 {
     public class OpenWeatherConnection : IWeatherConnection
     {
-        private const string _BaseAdress = "api.openweathermap.org/";
-        private const string _ByCityAdress = "data/2.5/weather?q=";
+        #region Constants and properties
+        public string _BaseAdress = "http://api.openweathermap.org/";
+        public string _APINowWeather = "data/2.5/weather";
+        public string _APIForecast3Hours = "data/2.5/forecast";
+        public string _ByCityAdress = "?q=";
+        public string _ByCityID = "?id=";
+        public string _GetXML = "&mode=xml";
+        public string APPID = "&APPID=29a20f74935ebf1b87a71157e2d58600";
 
+
+        static public string _TakeNumbersOnlyAndDot = "1234567890.";
+        static public string _TakeLetters = "\"QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm ";
+        public string _OpenWeatherMapApiJSONSeparator = "\":";
+
+        /**        private const string _BaseAdress = "http://api.openweathermap.org/";
+        private const string _ByCityAdress = "data/2.5/weather?q=";
+        private const string _ByGeoCoordinates = "data/2.5/weather?lat=";
+        private const string _ByGeoSeparator = "&lon=";
+        private const string _ByCodeSeparator = ",";
+        private const string _TakeNumbersOnlyAndDot = "1234567890.";
+        private const string _TakeLetters = "\"QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm ";
+        private const string _OpenWeatherMapApiJSONSeparator = "\":";*/
+
+        private string currentConnectionParametrs;
         private string _city;
         public string City
         {
+            set
+            {
+                _city = value;
+                currentConnectionParametrs = _ByCityAdress + _city + Language;
+            }
             get
             {
                 return _city;
             }
         }
 
-        private string _countryCode;
-        public string CountryCode
+        private string _cityCode;
+        public string CityCode
         {
-            get
+            set
             {
-                return _countryCode;
+                _cityCode = value;
+                currentConnectionParametrs = _ByCityID + _cityCode + Language;
             }
-        }
-
-        private double _latitude;
-        public double Latitude
-        {
             get
             {
-                return _latitude;
-            }
-        }
-
-        private double _longitude;
-        public double Longitude
-        {
-            get
-            {
-                return _longitude;
+                return _cityCode;
             }
         }
 
 		private string _LastRawData;
-        private async Task GetDataFromServer()
+        public string RawData
         {
-            using (var httpConnection = new HttpClient())
+            get
             {
-                httpConnection.BaseAddress = new Uri(_BaseAdress);
-                httpConnection.DefaultRequestHeaders.Accept.Clear();
-                httpConnection.DefaultRequestHeaders.Accept.Add(
-                    new MediaTypeWithQualityHeaderValue("application/json"));
+                return _LastRawData;
+            }
+        }
 
-                HttpResponseMessage response = await httpConnection.GetAsync(_ByCityAdress + _city + "," + _countryCode);
-                if (response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine(response.ToString());
-                    _LastRawData = response.ToString();
-                }
+        public static string TakeNumbersOnlyAndDot
+        {
+            get
+            {
+                return _TakeNumbersOnlyAndDot;
+            }
+        }
+
+        public string Language
+        {
+            get
+            {
+                return "&lang=pl";
             }
 
+            set
+            {
+               
+            }
         }
 
-        public string ParseStringBeforeSemicolon(string sectionName, string parametrName, string parametrSighs, string data)
+        #endregion
+        private string _lastConnectionString;
+        private string GetDataFromURI()
         {
-            string result = "";
-            result = data.Substring(
-                data.IndexOf(sectionName)
-                );
-               ;
-
-            result = result.Substring(result.IndexOf(parametrName+parametrSighs)+parametrName.Length+parametrSighs.Length);
-            result = result.Remove(6);
-
-
-
-            return result;
+            return GetDataFromURI(_lastConnectionString);
+        }
+        private string  GetDataFromURI(string connectionString)
+        {
+            
+            using (var httpConnection = new WebClient())
+            {
+               return _LastRawData = httpConnection.DownloadString(connectionString + APPID);
+            }
         }
 
-		private IWeatherData ParseJSONToData(string rawData)
+        public IDateWeatherData GetDateWeatherData()
         {
+            throw new NotImplementedException();
+        }
 
-            return new WeatherData();
+
+
+        private IWeatherData ParseJSONToData()
+        {
+             float temp = float.Parse(RawData.ParseAPIData("main", "temp", _OpenWeatherMapApiJSONSeparator, TakeNumbersOnlyAndDot),CultureInfo.InvariantCulture);
+            float maxTemp = float.Parse(RawData.ParseAPIData("main", "temp_max", _OpenWeatherMapApiJSONSeparator, TakeNumbersOnlyAndDot),CultureInfo.InvariantCulture);
+            float minTemp = float.Parse(RawData.ParseAPIData("main", "temp_min", _OpenWeatherMapApiJSONSeparator, TakeNumbersOnlyAndDot), CultureInfo.InvariantCulture);
+            int humidity = int.Parse(RawData.ParseAPIData("main", "humidity", _OpenWeatherMapApiJSONSeparator, TakeNumbersOnlyAndDot), CultureInfo.InvariantCulture);
+            float windSpeed = float.Parse(RawData.ParseAPIData("wind", "speed", _OpenWeatherMapApiJSONSeparator, TakeNumbersOnlyAndDot), CultureInfo.InvariantCulture);
+            float windDegree = float.Parse(RawData.ParseAPIData("wind", "deg", _OpenWeatherMapApiJSONSeparator, TakeNumbersOnlyAndDot), CultureInfo.InvariantCulture);
+            string description = RawData.ParseAPIData("weather", "description", _OpenWeatherMapApiJSONSeparator, _TakeLetters);
+            string mainWeather = RawData.ParseAPIData("weather", "main", _OpenWeatherMapApiJSONSeparator, _TakeLetters);
+
+            return new WeatherData(description,temp,humidity,mainWeather,maxTemp,minTemp,windDegree,windSpeed) ;
         }
 
         public IWeatherData GetWeatherData()
         {
-            GetDataFromServer().Wait();
-            return ParseJSONToData(_LastRawData);
+           
+            try
+            {
+                GetDataFromURI(_BaseAdress + _APINowWeather + currentConnectionParametrs);
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("There is no last working connectionString or you dont have internet!");
+                return new WeatherData("NaN",0,0,"NaN",0,0,0,0);
+            }
+            return ParseJSONToData();
         }
 
-        public bool SetNewWeatherTarget(string city)
-        {
-            _city = city;
-            return true;
-        }
-
-        public bool SetNewWeatherTarget(string city, string countryCode)
-        {
-            _city = city;
-            _countryCode = countryCode;
-            return true;
-        }
-
-        public bool SetNewWeatherTarget(double longitude, double latitude)
-        {
-            _latitude = latitude;
-            _longitude = longitude;
-            return true;
-        }
+      
     }
 }

@@ -8,14 +8,12 @@ namespace WeatherChecker.Abstracts
 {
     public interface IWeatherConnection
     {
-        double Longitude { get; }
-        double Latitude { get; }
-        string City { get; }
-        string CountryCode { get; }
+       
+        string City { get; set; }
+        string CityCode { get; set; }
+        string Language { get; set; }
 
         IWeatherData GetWeatherData();
-        bool SetNewWeatherTarget(double longitude, double latitude);
-        bool SetNewWeatherTarget(string city, string countryCode);
-        bool SetNewWeatherTarget(string city);
+        IDateWeatherData GetDateWeatherData();
     }
 }

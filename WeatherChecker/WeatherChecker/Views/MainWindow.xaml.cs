@@ -24,5 +24,15 @@ namespace WeatherChecker
         {
             InitializeComponent();
         }
+
+        private void label2_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void label2_TextChanged_1(object sender, TextChangedEventArgs e)
+        {
+
+        }
     }
 }
