@@ -10,9 +10,7 @@ namespace WeatherChecker.Abstracts
     {
         string MainInformation { get; }
         string Description { get; }
-
         float KelvinTemperature { get; }
-        
         float MaxKelvinTemperature { get; }
         float MinKelnivTemperature { get; }
 

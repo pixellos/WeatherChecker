@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace WeatherChecker.Abstracts
 {
-    public interface IDateWeatherData : IWeatherData
+    public interface IDateWeatherData 
     {
-        DateTime StartDateTime { get;}
-        DateTime EndDateTime { get; }
+       Dictionary<DateTime,IWeatherData> WeatherDataByDateTime { get; set; }
     }
 }

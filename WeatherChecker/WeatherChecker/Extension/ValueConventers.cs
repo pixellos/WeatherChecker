@@ -14,8 +14,7 @@ namespace WeatherChecker.Extension
             switch ( (string)value)
             {
                 default:
-                    return null;
-                    break;
+                    return @"http://images.clipartpanda.com/question-question_mark_blue.png";
                 case "\"Clouds\"":
                     return @"http://images.freeimages.com/images/previews/838/cloud-1573010.jpg";
             }
@@ -32,12 +31,8 @@ namespace WeatherChecker.Extension
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             double result = new Double() ;
-
             result = System.Convert.ToDouble(value);
-            
             return Math.Round( result - 273.15,2);
-                
-              
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

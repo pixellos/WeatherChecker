@@ -8,7 +8,6 @@ namespace WeatherChecker.Abstracts
 {
     public interface IWeatherConnection
     {
-       
         string City { get; set; }
         string CityCode { get; set; }
         string Language { get; set; }

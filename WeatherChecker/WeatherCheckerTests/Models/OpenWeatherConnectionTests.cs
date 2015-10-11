@@ -17,10 +17,11 @@ namespace WeatherChecker.Models.Tests
         [TestMethod()]
         public void GetWeatherDataTest()
         {
-            OpenWeatherConnection weather = new OpenWeatherConnection();
+            var weather = new OpenWeatherConnection();
             weather.City="Krosno";
             IWeatherData data = weather.GetWeatherData();
             
+            Assert.AreNotEqual(data,WeatherData.ERRORMODEL);
             Assert.IsNotNull(data.MainInformation);
             Assert.IsNotNull(data.Description);
             Assert.IsNotNull(data.KelvinTemperature);
@@ -30,7 +31,8 @@ namespace WeatherChecker.Models.Tests
             Assert.IsNotNull(data.WindDegree);
             Assert.IsNotNull(data.WindSpeed);
         }
-        [TestMethod()]
+
+        /*[TestMethod()]
         public void TestMultiHours()
         {
             OpenWeatherConnection weather = new OpenWeatherConnection() {_ByCityAdress= "data/2.5/forecast?q=", _OpenWeatherMapApiJSONSeparator="=\"" };
@@ -46,32 +48,24 @@ namespace WeatherChecker.Models.Tests
             Assert.AreNotEqual(0, data.WindDegree);
             Assert.AreNotEqual(0, data.WindSpeed);
         }
-
+        */
 
         [TestMethod()]
         public void GetWeatherAgainTest()
         {
-            OpenWeatherConnection weather = new OpenWeatherConnection();
+            var weather = new OpenWeatherConnection();
             weather.City = "Krosno";
             IWeatherData data = weather.GetWeatherData();
 
-            Assert.AreNotEqual("NaN", data.Description);
-            Assert.AreNotEqual("NaN", data.MainInformation);
-            Assert.AreNotEqual(0,data.KelvinTemperature);
-            Assert.AreNotEqual(0,data.Humidity);
-            Assert.AreNotEqual(0,data.MaxKelvinTemperature);
-            Assert.AreNotEqual(0,data.MinKelnivTemperature);
-            Assert.AreNotEqual(0,data.WindDegree);
-            Assert.AreNotEqual(0,data.WindSpeed);
+            Assert.AreNotEqual(data, WeatherData.ERRORMODEL);
         }
-
 
         [TestMethod()]
         public void Parsing()
         {
-            OpenWeatherConnection weather = new OpenWeatherConnection();
+            var weather = new OpenWeatherConnection();
             var s = TemplateJSON.ParseAPIData("main", "temp_max", "\":","0123456789.");
-            var result = Double.Parse(s, CultureInfo.InvariantCulture);
+            var result = double.Parse(s, CultureInfo.InvariantCulture);
             Assert.AreEqual(286.48,result);
         }
 

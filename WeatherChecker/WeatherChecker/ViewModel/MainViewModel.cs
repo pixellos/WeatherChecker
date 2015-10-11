@@ -5,19 +5,32 @@ using System.Text;
 using System.Threading.Tasks;
 using WeatherChecker.Abstracts;
 using System.ComponentModel;
+using System.Threading;
+using System.Windows;
+using WeatherChecker.Models;
 
 namespace WeatherChecker.ViewModel
 {
     public class MainViewModel :INotifyPropertyChanged
     {
-
-
         public MainViewModel()
         {
-            WeatherConnection = new WeatherChecker.Models.OpenWeatherConnection();
+            WeatherConnection = new OpenWeatherConnection();
             WeatherConnection.City = "Warsaw";
+            WeatherData = WeatherConnection.GetWeatherData();
+            new Thread(BackgroundThreat).Start();
         }
-        
+
+        void BackgroundThreat()
+        {
+            while (true)
+            {
+                Thread.Sleep(1000);
+                WeatherData = WeatherConnection.GetWeatherData();
+                OnPropertyChanged("weatherData");
+            }
+        }
+
         public IWeatherConnection WeatherConnection
         {
             get; set;
@@ -25,23 +38,18 @@ namespace WeatherChecker.ViewModel
 
         public string City
         {
-            set {
-                WeatherConnection.City = value;
-                OnPropertyChanged("weatherData");
+            set
+            {
+                if (value != string.Empty)
+                {
+                    WeatherConnection.City = value;
+                }
             }
             get { return WeatherConnection.City; }
         }
-
-
-        public IWeatherData weatherData
-        {
-            get
-            {
-                return WeatherConnection.GetWeatherData();
-            }
-        }
-
         
+        public IWeatherData WeatherData { get; private set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(string paramName)

@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace System
 {
-
-
     public static class JsonExtension
     {
-        
         public static string ParseAPIData(this string source, string sectionName, string parametrName, string parametrSighs, string acceptedSigns)
         {
             string result = "";
@@ -18,21 +15,24 @@ namespace System
             result = data.Substring(
                 data.IndexOf(sectionName)
                 );
-            ;
-            result = result.Substring(result.IndexOf(parametrName + parametrSighs) + parametrName.Length + parametrSighs.Length);
-            string endResult = "";
-            foreach (char chars in result)
+            if (source.Contains(parametrName))
             {
-                if (acceptedSigns.Contains(chars))
+                result = result.Substring(result.IndexOf(parametrName + parametrSighs) + parametrName.Length + parametrSighs.Length);
+                string endResult = "";
+                foreach (char chars in result)
                 {
-                    endResult += chars;
+                    if (acceptedSigns.Contains(chars))
+                    {
+                        endResult += chars;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-                else
-                {
-                    break;
-                }
+                return endResult;
             }
-            return endResult;
+            return "NaN";
         }
     }
 }
