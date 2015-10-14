@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using WeatherChecker.Abstracts;
@@ -13,13 +15,19 @@ namespace WeatherChecker.ViewModel.PartialViewModel
     public class ForecastPartialViewModel
     {
         private const int CountOfSections = 5;
-        private IDateWeatherData _dateWeatherData;
-        private Delegate _onPropertyChangedDelegate;
-        public ForecastPartialViewModel(IDateWeatherData dateWeatherData, Delegate onPropertyChangedDelegate)
+        private readonly IDateWeatherData _dateWeatherData;
+        private readonly Action _onClickChanged;
+
+        public ForecastPartialViewModel(IDateWeatherData dateWeatherData)
         {
             _dateWeatherData = dateWeatherData;
-            loadDataIntoSection();
-            _onPropertyChangedDelegate = onPropertyChangedDelegate;
+            LoadDataIntoSection();
+        }
+
+        public ForecastPartialViewModel(IDateWeatherData dateWeatherData, Action OnClickChanged) : this(dateWeatherData)
+        {
+            _onClickChanged = OnClickChanged;
+
         }
 
         private int _startId=0;
@@ -28,12 +36,20 @@ namespace WeatherChecker.ViewModel.PartialViewModel
         {
             get
             {
-                return new Command(new Action((() =>
+                if (_dateWeatherData != null)
                 {
-                    loadDataIntoSection();
-                    _onPropertyChangedDelegate.DynamicInvoke();
-                    MessageBox.Show("Next");
-                })));
+                    return new Command(new Action((() =>
+                    {
+                        if (_startId <= _dateWeatherData.DateTimes.Count - CountOfSections)
+                        {
+                            _startId++;
+                        }
+                        LoadDataIntoSection();
+                        _onClickChanged.Invoke();
+                    })));
+                }
+                
+                return null;
             }
         }
 
@@ -41,39 +57,55 @@ namespace WeatherChecker.ViewModel.PartialViewModel
         {
             get
             {
+                if (_dateWeatherData != null)
+                {
+                    
+                
                 return new Command(new Action((() =>
                 {
                     if (_startId -1 > 0)
                     {
                         _startId--;
                     }
-                    loadDataIntoSection();
-                    _onPropertyChangedDelegate.DynamicInvoke();
-                    MessageBox.Show("Perv");
+                    LoadDataIntoSection();
+                    _onClickChanged.Invoke();
                 })));
             }
+                
+                return null;
+        }
         }
 
-        private void loadDataIntoSection()
+        private void LoadDataIntoSection()
         {
-            for (int i = 0; i < CountOfSections; i++)
+            try
             {
-                if (_dateWeatherData.DateTimes.Count >= _startId + i)
+                if (_dateWeatherData != null)
                 {
-                    SectionDateTime[i] = _dateWeatherData.DateTimes[_startId + i];
-                    SectionWeatherData[i] = _dateWeatherData.WeatherDatas[_startId + 1];
+                    for (int i = 0; i < CountOfSections; i++)
+                    {
+                        if (_dateWeatherData.DateTimes.Count - 1 > _startId + i)
+                        {
+                            SectionDateTime[i] = _dateWeatherData.DateTimes[_startId + i];
+                            var test = _dateWeatherData.WeatherDatas[_startId + i];
+
+                            WeatherDataArray[i] = test;
+                        }
+                    }
                 }
             }
+            catch (Exception)
+            {
+                    
+                throw;
+            }
+            
         }
 
         #region Sections
         public DateTime[] SectionDateTime { get; set; } = new DateTime[CountOfSections];
+        public List<IWeatherData> WeatherDataArray { get; set; } = new List<IWeatherData>(6) {null,null,null,null,null};
         public IWeatherData[] SectionWeatherData { get; set; } = new IWeatherData[CountOfSections];
-
-      
-
         #endregion
-
-
     }
 }

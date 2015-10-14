@@ -112,7 +112,7 @@ namespace WeatherChecker.Models
                 xmlReader.ReadToFollowing("forecast");
 
                 DateWeatherData dateWeatherData = new DateWeatherData();
-                for (int i = 0; i < 39; i++)
+                for (int i = 0; i < 37; i++)
                 {
                     DateTime forecastDateTime = DateTime.Parse(
                        xmlReader.ParseApiData("time", "from"));

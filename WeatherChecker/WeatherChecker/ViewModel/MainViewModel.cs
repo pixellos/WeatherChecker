@@ -17,77 +17,76 @@ namespace WeatherChecker.ViewModel
 {
     public class MainViewModel :INotifyPropertyChanged
     {
-        private readonly IWeatherConnection WeatherConnection;
+        private readonly IWeatherConnection _weatherConnection;
 
-        private Thread _backgroundThread;
-        public MainViewModel()
+        void TakeWeatherData()
         {
-            dateWeatherPropertyChangedAction = () => { DateWeatherDataPropertyChanged(); };
-            WeatherConnection = new OpenWeatherConnection();
-            WeatherData = WeatherConnection.GetWeatherData();
-            dateWeatherData = WeatherConnection.GetDateWeatherData();
-            ForecastPartialViewModel = new ForecastPartialViewModel(dateWeatherData,dateWeatherPropertyChangedAction);
-            OnPropertyChanged("");
-            _backgroundThread = new Thread(BackgroundThreat) {IsBackground = true};
-            _backgroundThread.Start();
-           
-
+            ForecastPartialViewModel = new ForecastPartialViewModel(
+                _weatherConnection.GetDateWeatherData(),
+                () => {
+                          OnPropertyChanged("ForecastPartialViewModel"); }
+                );
         }
-
-        private Action dateWeatherPropertyChangedAction;
-        void DateWeatherDataPropertyChanged()
-        {
-            OnPropertyChanged("ForecastPartialViewModel");
-            MessageBox.Show("DelegateHit");
-        }
-
-        public string City
-        {
-            set
-            {
-                if (value != string.Empty)
-                {
-                    WeatherConnection.City = value;
-                    new Thread(TakeWeatherData)
-                    {
-                        IsBackground = true
-                    }
-                    .Start();
-                }
-            }
-            get { return WeatherConnection.City; }
-        }
-
-        public IWeatherData WeatherData { get; private set; }
 
         void BackgroundThreat()
         {
             while (true)
             {
                 Thread.Sleep(1000);
-                WeatherData = WeatherConnection.GetWeatherData();
-                OnPropertyChanged("weatherData");
+                WeatherData = _weatherConnection.GetWeatherData();
+                OnPropertyChanged("");
             }
         }
 
-        void TakeWeatherData()
+        public MainViewModel()
         {
-            ForecastPartialViewModel = new ForecastPartialViewModel(
-                WeatherConnection.GetDateWeatherData()
-                ,dateWeatherPropertyChangedAction);
-            OnPropertyChanged("ForecastPartialViewModel");
+            _weatherConnection = new OpenWeatherConnection();
+            if (_weatherConnection.City == null)
+            {
+                _weatherConnection.City = "New York";
+            }
+            WeatherData = _weatherConnection.GetWeatherData();
+
+            ForecastPartialViewModel = new ForecastPartialViewModel(_weatherConnection.GetDateWeatherData(), ()=> {OnPropertyChanged("ForecastPartialViewModel");});
+            OnPropertyChanged("");
+
+            new Thread(BackgroundThreat) {IsBackground = true}.Start();
         }
+
+       
+        public string City
+        {
+            set
+            {
+                if (value !=null)
+                {
+                    _weatherConnection.City = value;
+                    new Thread(TakeWeatherData) {IsBackground = true}.Start();
+                }
+            }
+            get { return _weatherConnection.City; }
+        }
+
+        public IWeatherData WeatherData { get; private set; }
+       
         #region forecast
 
-        IDateWeatherData dateWeatherData;
+        private ForecastPartialViewModel _forecastPartialViewModel;
+        public ForecastPartialViewModel ForecastPartialViewModel {
+            get
+            {
+                return _forecastPartialViewModel;
+            }
+            private set
+            {
+                _forecastPartialViewModel = value;
+                OnPropertyChanged("ForecastPartialViewModel");
+            }
 
-        public ForecastPartialViewModel ForecastPartialViewModel { get; set; }
+        }
         #endregion forecast
 
-
-
         #region PropertyChanged
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(string paramName)
@@ -99,7 +98,5 @@ namespace WeatherChecker.ViewModel
             }
         }
         #endregion PropertyChanged
-
-      
     }
 }

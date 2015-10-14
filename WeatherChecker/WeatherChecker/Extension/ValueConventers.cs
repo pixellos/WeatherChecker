@@ -5,6 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Media;
+using WeatherChecker.Properties;
+using WeatherChecker;
 namespace WeatherChecker.Extension
 {
     public class WeatherToPictureConverter : IValueConverter
@@ -14,9 +17,19 @@ namespace WeatherChecker.Extension
             switch ( (string)value)
             {
                 default:
-                    return @"http://images.clipartpanda.com/question-question_mark_blue.png";
+                    return @"..\Resources\Slonecznie.jpg";
                 case "\"Clouds\"":
-                    return @"http://images.freeimages.com/images/previews/838/cloud-1573010.jpg";
+                    return @"..\Resources\Pochmurno.jpg";
+                    case "\"Clear\"":
+                    return @"..\Resources\Slonecznie.jpg";
+                case "\"Shower\"":
+                    return @"..\Resources\Deszcz.jpg";
+                case "\"Fog\"":
+                    return @"..\Resources\Mgla.jpg";
+                case "\"Few clouds\"":
+                    return @"..\Resources\Zprzejasnieniami.jpg";
+                case "\"Rain\"":
+                    return @"..\Resources\Deszcz.jpg";
             }
         }
 
