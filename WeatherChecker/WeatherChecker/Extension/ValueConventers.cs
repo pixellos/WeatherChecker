@@ -32,12 +32,15 @@ namespace WeatherChecker.Extension
         {
             double result = new Double() ;
             result = System.Convert.ToDouble(value);
-            return Math.Round( result - 273.15,2);
+            return Math.Round( result - 273.15,2) + " ºC ";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return System.Convert.ToDouble(value) + 273.15;
+            return System.Convert.ToDouble(value) + 273.15 + "ºF";
         }
     }
+
+
+    
 }

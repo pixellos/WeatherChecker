@@ -7,19 +7,58 @@ using WeatherChecker.Abstracts;
 using System.ComponentModel;
 using System.Threading;
 using System.Windows;
+using System.Windows.Input;
+using System.Windows.Threading;
 using WeatherChecker.Models;
+using WeatherChecker.ViewModel.Helper;
+using WeatherChecker.ViewModel.PartialViewModel;
 
 namespace WeatherChecker.ViewModel
 {
     public class MainViewModel :INotifyPropertyChanged
     {
+        private readonly IWeatherConnection WeatherConnection;
+
+        private Thread _backgroundThread;
         public MainViewModel()
         {
+            dateWeatherPropertyChangedAction = () => { DateWeatherDataPropertyChanged(); };
             WeatherConnection = new OpenWeatherConnection();
-            WeatherConnection.City = "Warsaw";
             WeatherData = WeatherConnection.GetWeatherData();
-            new Thread(BackgroundThreat).Start();
+            dateWeatherData = WeatherConnection.GetDateWeatherData();
+            ForecastPartialViewModel = new ForecastPartialViewModel(dateWeatherData,dateWeatherPropertyChangedAction);
+            OnPropertyChanged("");
+            _backgroundThread = new Thread(BackgroundThreat) {IsBackground = true};
+            _backgroundThread.Start();
+           
+
         }
+
+        private Action dateWeatherPropertyChangedAction;
+        void DateWeatherDataPropertyChanged()
+        {
+            OnPropertyChanged("ForecastPartialViewModel");
+            MessageBox.Show("DelegateHit");
+        }
+
+        public string City
+        {
+            set
+            {
+                if (value != string.Empty)
+                {
+                    WeatherConnection.City = value;
+                    new Thread(TakeWeatherData)
+                    {
+                        IsBackground = true
+                    }
+                    .Start();
+                }
+            }
+            get { return WeatherConnection.City; }
+        }
+
+        public IWeatherData WeatherData { get; private set; }
 
         void BackgroundThreat()
         {
@@ -31,24 +70,23 @@ namespace WeatherChecker.ViewModel
             }
         }
 
-        public IWeatherConnection WeatherConnection
+        void TakeWeatherData()
         {
-            get; set;
+            ForecastPartialViewModel = new ForecastPartialViewModel(
+                WeatherConnection.GetDateWeatherData()
+                ,dateWeatherPropertyChangedAction);
+            OnPropertyChanged("ForecastPartialViewModel");
         }
+        #region forecast
 
-        public string City
-        {
-            set
-            {
-                if (value != string.Empty)
-                {
-                    WeatherConnection.City = value;
-                }
-            }
-            get { return WeatherConnection.City; }
-        }
-        
-        public IWeatherData WeatherData { get; private set; }
+        IDateWeatherData dateWeatherData;
+
+        public ForecastPartialViewModel ForecastPartialViewModel { get; set; }
+        #endregion forecast
+
+
+
+        #region PropertyChanged
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -60,5 +98,8 @@ namespace WeatherChecker.ViewModel
                 handler(this, new PropertyChangedEventArgs(paramName));
             }
         }
+        #endregion PropertyChanged
+
+      
     }
 }

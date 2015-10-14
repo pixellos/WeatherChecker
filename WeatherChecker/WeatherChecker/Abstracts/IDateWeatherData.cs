@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,8 +7,17 @@ using System.Threading.Tasks;
 
 namespace WeatherChecker.Abstracts
 {
-    public interface IDateWeatherData 
+    
+
+
+    public interface IDateWeatherData
     {
-       Dictionary<DateTime,IWeatherData> WeatherDataByDateTime { get; set; }
+        List<DateTime> DateTimes { get;  }
+
+        List<IWeatherData> WeatherDatas { get;  }
+
+        void Add(DateTime dateTime, IWeatherData weatherData);
+        
+
     }
 }

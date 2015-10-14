@@ -59,6 +59,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ViewModel\PartialViewModel\ForecastPartialView.cs" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -75,6 +76,7 @@
     <Compile Include="Models\DateWeatherData.cs" />
     <Compile Include="Models\OpenWeatherConnection.cs" />
     <Compile Include="Models\WeatherData.cs" />
+    <Compile Include="ViewModel\Helper\Command.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

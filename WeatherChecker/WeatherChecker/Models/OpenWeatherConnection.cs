@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 using WeatherChecker.Abstracts;
 using System.Net;
 using System.Globalization;
-
+using System.Security.AccessControl;
+using System.Xml;
+using System.Text;
+using System.Windows;
+using System.Windows.Documents;
 namespace WeatherChecker.Models
 {
     public class OpenWeatherConnection : IWeatherConnection
@@ -20,22 +24,26 @@ namespace WeatherChecker.Models
         private const string GetXml = "&mode=xml";
         private const string Appid = "&APPID=29a20f74935ebf1b87a71157e2d58600";
         private const string TakeNumbersOnlyAndDot = "1234567890.";
-        private const string TakeLetters = "\"QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm ";
+        private const string TakeLetters = "\"QWERTYUIOPASDFGHJKLZXCVBNMĘÓĄŚŁŻŹĆŃqwertyuiopasdfghjklzxcvbnmąężźćółńśę ";
         private const string OpenWeatherMapApiJsonSeparator = "\":";
 
         private string _currentConnectionParametrs;
-        private string _city;
+
+        public OpenWeatherConnection()
+        {
+            City = City;
+
+        }
+        //private string _city;
         public string City
         {
             set
             {
-                _city = value;
-                _currentConnectionParametrs = ByCityAdress + _city + Language;
+                Properties.Settings.Default.City = value;
+                Properties.Settings.Default.Save();
+                _currentConnectionParametrs = ByCityAdress + City + Language+Appid;
             }
-            get
-            {
-                return _city;
-            }
+            get { return Properties.Settings.Default.City; }
         }
 
         private string _cityCode;
@@ -70,7 +78,6 @@ namespace WeatherChecker.Models
             }
             set
             {
-               
             }
         }
 
@@ -80,26 +87,68 @@ namespace WeatherChecker.Models
         {
             using (var httpConnection = new WebClient())
             {
-               return httpConnection.DownloadString(connectionString + Appid);
+               return httpConnection.DownloadString(connectionString);
             }
         }
 
-        public IDateWeatherData GetDateWeatherData(string source, string OpenWeatherMapApiSeparator)
+        public IDateWeatherData GetDateWeatherData()
         {
-            throw new NotImplementedException();
-            string temporaryData;
             try
             {
-                temporaryData = GetDataFromUri(BaseAdress + ApiForecast3Hours + _currentConnectionParametrs);
+                return parseToDateWeatherData(BaseAdress + ApiForecast3Hours + _currentConnectionParametrs + GetXml);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                Console.WriteLine("There is no last working connectionString or you dont have internet!");
-                return new DateWeatherData();
+                return null;
+                Console.WriteLine("Invaild input");
             }
-            ParseToIWeatherData(temporaryData, OpenWeatherMapApiJsonSeparator);
+           
         }
 
+        private IDateWeatherData parseToDateWeatherData(string connectionString)
+        {
+            using (XmlReader xmlReader = XmlReader.Create(connectionString + "&units=standard")) // sample api call = http://api.openweathermap.org/data/2.5/forecast?q=Krosno&lang=pl&APPID=29a20f74935ebf1b87a71157e2d58600&mode=xml&units=standard
+            {
+                xmlReader.ReadToFollowing("forecast");
+
+                DateWeatherData dateWeatherData = new DateWeatherData();
+                for (int i = 0; i < 39; i++)
+                {
+                    DateTime forecastDateTime = DateTime.Parse(
+                       xmlReader.ParseApiData("time", "from"));
+
+                    IWeatherData date = ParseXMLToWeatherData(xmlReader);
+                 
+                    dateWeatherData.Add(forecastDateTime,date);
+                }
+
+                return dateWeatherData;
+            }
+        }
+
+        private static IWeatherData ParseXMLToWeatherData(XmlReader xmlReader)
+        {
+            string weatherDescription = xmlReader.ParseApiData(
+                        "symbol", "name");
+
+            string weatherType = xmlReader.ParseApiData(
+                "precipitation", "type");
+
+            float weatherWindDegree = float.Parse(
+                xmlReader.ParseApiData("windDirection", "deg"));
+
+            float windSpeed = float.Parse(xmlReader.ParseApiData(
+                "windSpeed", "mps"));
+
+            float temperature = float.Parse(xmlReader.ParseApiData(
+                "temperature", "value"));
+
+            int humidity = int.Parse(xmlReader.ParseApiData(
+                "humidity", "value"));
+
+            return new WeatherData(weatherDescription, temperature, humidity, weatherType, weatherWindDegree, windSpeed);
+
+        }
 
         private static IWeatherData ParseToIWeatherData(string source,string OpenWeatherMapApiSeparator )
         {
@@ -113,9 +162,9 @@ namespace WeatherChecker.Models
             int humidity = int.Parse(source.ParseAPIData("main", "humidity", OpenWeatherMapApiSeparator, TakeNumbersOnlyAndDot), CultureInfo.InvariantCulture);
             float windSpeed = float.Parse(source.ParseAPIData("wind", "speed", OpenWeatherMapApiSeparator, TakeNumbersOnlyAndDot), CultureInfo.InvariantCulture);
             float windDegree = float.Parse(source.ParseAPIData("wind", "deg", OpenWeatherMapApiSeparator, TakeNumbersOnlyAndDot), CultureInfo.InvariantCulture);
-            string description = source.ParseAPIData("weather", "description", OpenWeatherMapApiSeparator, TakeLetters);
+            string description = source.ParseAPIData("weather", "description", OpenWeatherMapApiSeparator, TakeLetters).Replace('\"',' ');
             string mainWeather = source.ParseAPIData("weather", "main", OpenWeatherMapApiSeparator, TakeLetters);
-            return new WeatherData(description, temp, humidity, mainWeather, maxTemp, minTemp, windDegree, windSpeed);
+            return new WeatherData(description, temp, humidity, mainWeather,windDegree, windSpeed);
         }
 
         private IWeatherData ParseJSONToIWeatherData(string source)
@@ -141,9 +190,6 @@ namespace WeatherChecker.Models
             return temporarData;
         }
 
-        public IDateWeatherData GetDateWeatherData()
-        {
-            throw new NotImplementedException();
-        }
+       
     }
 }

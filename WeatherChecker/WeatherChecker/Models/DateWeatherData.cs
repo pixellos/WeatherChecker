@@ -6,6 +6,23 @@ namespace WeatherChecker.Models
 {
     internal class DateWeatherData : IDateWeatherData
     {
-        public Dictionary<DateTime, IWeatherData> WeatherDataByDateTime { get; set; }
+        public DateWeatherData()
+        {
+           DateTimes = new List<DateTime>();
+            WeatherDatas = new List<IWeatherData>();
+        }
+        public List<DateTime> DateTimes { get; set; }
+        public List<IWeatherData> WeatherDatas { get; set; }
+
+        public void Add(DateTime dateTime, IWeatherData weatherData)
+        {
+            DateTimes.Add(dateTime);
+            WeatherDatas.Add(weatherData);
+        }
+
+        public int Count()
+        {
+           return DateTimes.Count;
+        }
     }
 }

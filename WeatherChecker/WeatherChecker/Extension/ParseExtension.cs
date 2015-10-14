@@ -3,9 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace System
 {
+    public static class XmlExtension
+    {
+        public static string ParseApiData(this XmlReader reader, string Section,
+            string Atribute)
+        {
+            reader.ReadToFollowing(Section);
+            reader.MoveToAttribute(Atribute);
+            return reader.Value;
+        }
+    }
+
     public static class JsonExtension
     {
         public static string ParseAPIData(this string source, string sectionName, string parametrName, string parametrSighs, string acceptedSigns)

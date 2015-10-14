@@ -26,29 +26,22 @@ namespace WeatherChecker.Models.Tests
             Assert.IsNotNull(data.Description);
             Assert.IsNotNull(data.KelvinTemperature);
             Assert.IsNotNull(data.Humidity) ;
-            Assert.IsNotNull(data.MaxKelvinTemperature);
-            Assert.IsNotNull(data.MinKelnivTemperature);
             Assert.IsNotNull(data.WindDegree);
             Assert.IsNotNull(data.WindSpeed);
         }
 
-        /*[TestMethod()]
+        [TestMethod()]
         public void TestMultiHours()
         {
-            OpenWeatherConnection weather = new OpenWeatherConnection() {_ByCityAdress= "data/2.5/forecast?q=", _OpenWeatherMapApiJSONSeparator="=\"" };
+            OpenWeatherConnection weather = new OpenWeatherConnection();
             weather.City = "Krosno";
-            IWeatherData data = weather.GetWeatherData();
+            IDateWeatherData data = weather.GetDateWeatherData();
 
-            Assert.AreNotEqual("NaN", data.Description);
-            Assert.AreNotEqual("NaN", data.MainInformation);
-            Assert.AreNotEqual(0, data.KelvinTemperature);
-            Assert.AreNotEqual(0, data.Humidity);
-            Assert.AreNotEqual(0, data.MaxKelvinTemperature);
-            Assert.AreNotEqual(0, data.MinKelnivTemperature);
-            Assert.AreNotEqual(0, data.WindDegree);
-            Assert.AreNotEqual(0, data.WindSpeed);
+            Assert.IsNotNull(data.DateTimes);
+            Assert.IsNotNull(data.WeatherDatas);
+            Assert.AreEqual(data.DateTimes.Count,data.WeatherDatas.Count);    
         }
-        */
+        
 
         [TestMethod()]
         public void GetWeatherAgainTest()

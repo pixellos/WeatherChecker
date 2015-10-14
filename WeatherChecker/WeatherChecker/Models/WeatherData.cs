@@ -10,16 +10,15 @@ namespace WeatherChecker.Models
     public class WeatherData : IWeatherData
     {
 
-        public static IWeatherData ERRORMODEL = new WeatherData("NaN",0,0,"NaN",0,0,0,0);
+        public static IWeatherData ERRORMODEL = new WeatherData("NaN",0,0,"NaN",0,0);
         public WeatherData(string description,float farenheitTemperature,int humidity,string mainInformation,
-            float maxFarenheitTemperature, float minFarenheitTemperature, float windDegree, float windSpeed)
+             float windDegree, float windSpeed)
         {
             _description = description;
             _farenheitTemperature = farenheitTemperature;
             _humidity = humidity;
             _mainInformation = mainInformation;
-            _maxFarenheitTemperature = maxFarenheitTemperature;
-            _minFarenheitTemperature = minFarenheitTemperature;
+  
             _windDegree = windDegree;
             _windSpeed = windSpeed;
 
@@ -60,23 +59,6 @@ namespace WeatherChecker.Models
             }
         }
 
-        private float _maxFarenheitTemperature;
-        public float MaxKelvinTemperature
-        {
-            get
-            {
-                return _maxFarenheitTemperature;
-            }
-        }
-
-        private float _minFarenheitTemperature;
-        public float MinKelnivTemperature
-        {
-            get
-            {
-                return _minFarenheitTemperature;
-            }
-        }
 
         private float _windDegree;
         public float WindDegree
