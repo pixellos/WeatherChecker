@@ -32,7 +32,6 @@ namespace WeatherChecker.Models
         public OpenWeatherConnection()
         {
             City = City;
-
         }
         //private string _city;
         public string City
@@ -100,9 +99,7 @@ namespace WeatherChecker.Models
             catch (Exception exception)
             {
                 return null;
-                Console.WriteLine("Invaild input");
             }
-           
         }
 
         private IDateWeatherData parseToDateWeatherData(string connectionString)
@@ -116,12 +113,9 @@ namespace WeatherChecker.Models
                 {
                     DateTime forecastDateTime = DateTime.Parse(
                        xmlReader.ParseApiData("time", "from"));
-
                     IWeatherData date = ParseXMLToWeatherData(xmlReader);
-                 
                     dateWeatherData.Add(forecastDateTime,date);
                 }
-
                 return dateWeatherData;
             }
         }
@@ -147,7 +141,6 @@ namespace WeatherChecker.Models
                 "humidity", "value"));
 
             return new WeatherData(weatherDescription, temperature, humidity, weatherType, weatherWindDegree, windSpeed);
-
         }
 
         private static IWeatherData ParseToIWeatherData(string source,string OpenWeatherMapApiSeparator )
@@ -189,7 +182,5 @@ namespace WeatherChecker.Models
             }
             return temporarData;
         }
-
-       
     }
 }

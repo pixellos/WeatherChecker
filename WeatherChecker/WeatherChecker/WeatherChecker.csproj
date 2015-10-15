@@ -89,6 +89,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Abstracts\IUserInterface.cs" />
+    <Compile Include="Models\UserInterface.cs" />
     <Compile Include="ViewModel\PartialViewModel\ForecastPartialView.cs" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

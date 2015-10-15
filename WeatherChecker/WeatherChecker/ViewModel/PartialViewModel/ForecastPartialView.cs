@@ -14,7 +14,7 @@ namespace WeatherChecker.ViewModel.PartialViewModel
 {
     public class ForecastPartialViewModel
     {
-        private const int CountOfSections = 5;
+        private const int CountOfSections = 3;
         private readonly IDateWeatherData _dateWeatherData;
         private readonly Action _onClickChanged;
 

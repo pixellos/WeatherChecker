@@ -18,7 +18,7 @@ namespace WeatherChecker.ViewModel
     public class MainViewModel :INotifyPropertyChanged
     {
         private readonly IWeatherConnection _weatherConnection;
-
+        public IUserInterface UserInterface { get; } = new UserInterface();
         void TakeWeatherData()
         {
             ForecastPartialViewModel = new ForecastPartialViewModel(
