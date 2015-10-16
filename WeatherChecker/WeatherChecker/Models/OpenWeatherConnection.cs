@@ -16,6 +16,7 @@ namespace WeatherChecker.Models
     public class OpenWeatherConnection : IWeatherConnection
     {
         #region Constants and properties
+        private const int CountOfForecastSections3Hours5Days = (24 / 3) * 5 - 1;
         private const string BaseAdress = "http://api.openweathermap.org/";
         private const string ApiNowWeather = "data/2.5/weather";
         private const string ApiForecast3Hours = "data/2.5/forecast";
@@ -109,7 +110,7 @@ namespace WeatherChecker.Models
                 xmlReader.ReadToFollowing("forecast");
 
                 DateWeatherData dateWeatherData = new DateWeatherData();
-                for (int i = 0; i < 37; i++)
+                for (int i = 0; i < CountOfForecastSections3Hours5Days; i++)
                 {
                     DateTime forecastDateTime = DateTime.Parse(
                        xmlReader.ParseApiData("time", "from"));
