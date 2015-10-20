@@ -12,31 +12,31 @@ using System.Windows.Threading;
 using WeatherChecker.Models;
 using WeatherChecker.ViewModel.Helper;
 using WeatherChecker.ViewModel.PartialViewModel;
+using Timer = System.Threading.Timer;
 
 namespace WeatherChecker.ViewModel
 {
-    public class MainViewModel :INotifyPropertyChanged
+    public class MainViewModel : INotifyPropertyChanged
     {
         private readonly IWeatherConnection _weatherConnection;
         public IUserInterface UserInterface { get; } = new UserInterface();
-        void TakeWeatherData()
+        void getForecastData()
         {
             ForecastPartialViewModel = new ForecastPartialViewModel(
                 _weatherConnection.GetDateWeatherData(),
-                () => {
-                          OnPropertyChanged("ForecastPartialViewModel"); }
-                );
+                () =>
+                {
+                    OnPropertyChanged("ForecastPartialViewModel");
+                });
         }
 
-        void BackgroundThreat()
+        void getWeatherData()
         {
-            while (true)
-            {
-                Thread.Sleep(1000);
                 WeatherData = _weatherConnection.GetWeatherData();
-                OnPropertyChanged("");
-            }
+                OnPropertyChanged("WeatherData");      
         }
+
+        private Timer _timer;
 
         public MainViewModel()
         {
@@ -45,34 +45,43 @@ namespace WeatherChecker.ViewModel
             {
                 _weatherConnection.City = "New York";
             }
-            WeatherData = _weatherConnection.GetWeatherData();
 
-            ForecastPartialViewModel = new ForecastPartialViewModel(_weatherConnection.GetDateWeatherData(), ()=> {OnPropertyChanged("ForecastPartialViewModel");});
+            WeatherData = _weatherConnection.GetWeatherData();
+            ForecastPartialViewModel = new ForecastPartialViewModel(_weatherConnection.GetDateWeatherData(), () => { OnPropertyChanged("ForecastPartialViewModel"); });
             OnPropertyChanged("");
 
-            new Thread(BackgroundThreat) {IsBackground = true}.Start();
+            timerConfiguration();
         }
 
-       
+        private void timerConfiguration()
+        {
+            _timer = new Timer(new TimerCallback((x) =>
+            {
+                getWeatherData();
+            }), null, 0, 3000);
+            
+        }
+
         public string City
         {
             set
             {
-                if (value !=null)
+                if (value != null)
                 {
                     _weatherConnection.City = value;
-                    new Thread(TakeWeatherData) {IsBackground = true}.Start();
+                    new Task(() => getForecastData()).Start();
                 }
             }
             get { return _weatherConnection.City; }
         }
 
         public IWeatherData WeatherData { get; private set; }
-       
+
         #region forecast
 
         private ForecastPartialViewModel _forecastPartialViewModel;
-        public ForecastPartialViewModel ForecastPartialViewModel {
+        public ForecastPartialViewModel ForecastPartialViewModel
+        {
             get
             {
                 return _forecastPartialViewModel;

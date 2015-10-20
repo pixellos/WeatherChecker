@@ -34,7 +34,7 @@ namespace WeatherChecker.Models.Tests
         public void TestMultiHours()
         {
             OpenWeatherConnection weather = new OpenWeatherConnection();
-            weather.City = "Krosno";
+            weather.City = "Warsaw";
             IDateWeatherData data = weather.GetDateWeatherData();
 
             Assert.IsNotNull(data.DateTimes);

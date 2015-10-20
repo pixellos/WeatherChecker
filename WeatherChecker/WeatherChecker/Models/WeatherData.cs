@@ -9,7 +9,6 @@ namespace WeatherChecker.Models
 {
     public class WeatherData : IWeatherData
     {
-
         public static IWeatherData ERRORMODEL = new WeatherData("NaN",0,0,"NaN",0,0);
         public WeatherData(string description,float farenheitTemperature,int humidity,string mainInformation,
              float windDegree, float windSpeed)
@@ -77,7 +76,5 @@ namespace WeatherChecker.Models
                 return _windSpeed;   
             }
         }
-
-        
     }
 }

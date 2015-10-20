@@ -16,7 +16,7 @@ namespace WeatherChecker.Models
     public class OpenWeatherConnection : IWeatherConnection
     {
         #region Constants and properties
-        private const int CountOfForecastSections3Hours5Days = (24 / 3) * 5 - 1;
+        private const int CountOfForecastSections3Hours5Days = ((24 / 3) * 4);
         private const string BaseAdress = "http://api.openweathermap.org/";
         private const string ApiNowWeather = "data/2.5/weather";
         private const string ApiForecast3Hours = "data/2.5/forecast";
@@ -76,11 +76,8 @@ namespace WeatherChecker.Models
             {
                 return "&lang=pl";
             }
-            set
-            {
-            }
+            set{}
         }
-
         #endregion
         
         private static string  GetDataFromUri(string connectionString)
@@ -99,6 +96,7 @@ namespace WeatherChecker.Models
             }
             catch (Exception exception)
             {
+                Console.WriteLine(exception.ToString());
                 return null;
             }
         }

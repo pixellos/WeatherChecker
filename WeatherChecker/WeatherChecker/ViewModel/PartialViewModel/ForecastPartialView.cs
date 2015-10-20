@@ -14,7 +14,7 @@ namespace WeatherChecker.ViewModel.PartialViewModel
 {
     public class ForecastPartialViewModel
     {
-        private const int CountOfSections = 5;
+        private const int CountOfSections = 3;
         private readonly IDateWeatherData _dateWeatherData;
         private readonly Action _onClickChanged;
 
@@ -44,10 +44,10 @@ namespace WeatherChecker.ViewModel.PartialViewModel
                             _startId++;
                         }
                         LoadDataIntoSection();
-                        _onClickChanged.Invoke();
-                    })));
+                        _onClickChanged.Invoke();})));
                 }
                 return null;
+
             }
         }
 
@@ -64,11 +64,10 @@ namespace WeatherChecker.ViewModel.PartialViewModel
                         _startId--;
                     }
                     LoadDataIntoSection();
-                    _onClickChanged.Invoke();
-                })));
-            }
+                    _onClickChanged.Invoke();})));
+                }
                 return null;
-        }
+            }
         }
 
         private void LoadDataIntoSection()
@@ -79,7 +78,7 @@ namespace WeatherChecker.ViewModel.PartialViewModel
                 {
                     for (int i = 0; i < CountOfSections; i++)
                     {
-                        if (_dateWeatherData.DateTimes.Count - 1 > _startId + i)
+                        if (_dateWeatherData.DateTimes.Count - 1 > _startId + CountOfSections)
                         {
                             SectionDateTime[i] = _dateWeatherData.DateTimes[_startId + i];
                             var test = _dateWeatherData.WeatherDatas[_startId + i];
